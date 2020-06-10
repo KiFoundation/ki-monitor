@@ -18,7 +18,7 @@ The generator allows to:
 The monitor is configured from the `config.json` file. Following are the details of its parameters:
 
 - `api` : the URL of the REST server to query.
-- `validators` : an array with the operator addresses of the nodes to monitor. An empty array `[]` means that all the active validators are monitored.
+- `validators` : an array with the operator addresses (`tkivaloper1...`) of the nodes to monitor. An empty array `[]` means that all the active validators are monitored.
 - `hook` : the Slack Webhook to send Slack alerts.
 - `slack_users` : the slack users to notify with their personal configuration. This is an object (see below).
 - `alert_thresholds` : an object with key/values pair, where the keys are integers and values are the number of missed blocks that defines the severity of the alert.
@@ -51,12 +51,12 @@ If you want to receive notifications about the activity of your validators throu
     .
     .
     .
-    "<Your operator ID (tkivaloper1...)>":["<@your slack user ID>", <the alert threshold>]
+    "Your_operator_address":["<@your_slack_user_ID>", the_alert_threshold]
   },
   ```
 - Or simply post the following message to the following channel:
   ```
-  "<Your operator ID (tkivaloper1...)>":["<@your slack user ID>", <the alert threshold>]
+  "Your_operator_address":["<@your_slack_user_ID>", the_alert_threshold]
   ```
 
 ## Security
