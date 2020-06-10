@@ -161,8 +161,8 @@ async function runMonitor(update_all) {
     if (temp_missed >= 10) {
       // Tag if the user chose to recieve an alert for the current number of missed blocks
       if (Object.keys(slack_users).includes(val)) {
-        temp_tag = (temp_missed >= alert_thresholds[slack_users[val][1]]);
-        temp_mention = slack_users[val][0];
+        temp_tag = (temp_missed >= alert_thresholds[slack_users[val].alert_threshold]);
+        temp_mention = slack_users[val].slack_username;
       } else {
         temp_tag = false;
         temp_mention = 0;

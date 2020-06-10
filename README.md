@@ -51,12 +51,18 @@ If you want to receive notifications about the activity of your validators throu
     .
     .
     .
-    "Your_operator_address":["<@your_slack_user_ID>", the_alert_threshold]
+    "Your_operator_address":{
+      slack_username : "<@your_slack_user_ID>"
+      alert_threshold : the_alert_threshold
+     }
   },
   ```
-- Or simply post the following message to the following channel:
+- Or simply post the following message to the [validator-alerts](https://kiecosystem.slack.com/archives/C01557XBHEF) channel:
   ```
-  "Your_operator_address":["<@your_slack_user_ID>", the_alert_threshold]
+  "Your_operator_address":{
+    slack_username : "<@your_slack_user_ID>"
+    alert_threshold : the_alert_threshold
+   }
   ```
 
 ## Security
