@@ -21,14 +21,12 @@ async function getAllActiveValidators() {
       console.log(error);
     })
 
-
   for (validator of validators) {
     validator_data[validator.operator_address] = {
       moniker: validator.description.moniker,
       pubkey: validator.consensus_pubkey
     }
   }
-
   return validator_data;
 }
 
@@ -69,7 +67,7 @@ async function getSigningInfo() {
 }
 
 // Format the alert message and send it to slack
-function send_alerts(data) {
+function sendAlerts(data) {
   let messageBody = {
     "text": ""
   }
@@ -125,8 +123,9 @@ function send_alerts(data) {
 function getSeverity(missed) {
   var sev = 0;
   var i = 0;
-  while (alert_thresholds[i] <= missed) {
-    sev = i;
+  var keys = Object.keys(alert_thresholds)
+  while (alert_thresholds[keys[i]] <= missed) {
+    sev = keys[i];
     i++;
   }
   return sev
@@ -155,7 +154,7 @@ async function runMonitor(update_all) {
     var temp_missed = data3[data2[data1[val].pubkey]]
 
     // for testing
-    // var temp_missed = Math.floor(Math.random()*100)
+    // var temp_missed = Math.floor(Math.random() * 100)
 
     // if it is greater than the threashold send an alert on slack
     if (temp_missed >= 10) {
@@ -172,7 +171,7 @@ async function runMonitor(update_all) {
     }
   }
 
-  const slackResponse = await send_alerts(validators_to_alert)
+  const slackResponse = await sendAlerts(validators_to_alert)
   return slackResponse;
 }
 
