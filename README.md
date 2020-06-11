@@ -45,7 +45,7 @@ Indeed, this will launch a single monitoring cycle. To have a permanent monitori
 
 ## Subscribe to the KI ecosystem Slack alerts
 If you want to receive notifications about the activity of your validators through the Ki Ecosystem Slack, please:
-- Create a PR to this repository that adds your operator address, slack user ID and your chosen alert threshold ([0, 4]) to the config file. E.g.,
+- Create a PR to this repository that adds your operator address, slack user ID and your chosen alert threshold to the config file. E.g.,
   ```
   "slack_users" : {
     .
