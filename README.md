@@ -8,23 +8,37 @@ This repository hosts `ki-monitor`, a simple script to monitor and alert the KiC
 
 ## Functionalities
 
-The generator allows to:
+The **validator monitor** allows to:
 
 -   Track the number of missed block over set time windows.
 -   Send slack messages to alert the operators.
 -   Configure the level and thresholds of alerts.
 
+The **block monitor** allows to:
+- Ensure that the node is always synched to the highest block number.
+- Send slack messages to alert the operators.
+- Monitor multiple APIs (nodes).
+
+
 ## Configurations
-The monitor is configured from the `config.json` file. Following are the details of its parameters:
+The **validator monitor** is configured from the `config.json` file. Following are the details of its parameters:
 
 - `api` : the URL of the REST server to query.
 - `validators` : an array with the operator addresses (`tkivaloper1...`) of the nodes to monitor. An empty array `[]` means that all the active validators are monitored.
 - `hook` : the Slack Webhook to send Slack alerts.
+- `watcher`: the ping URL of a Cron Job Monitoring service (such as [healthchecks.io](https://healthchecks.io/)). To receive an alert if this script isn't running.
 - `slack_users` : the slack users to notify with their personal configuration. This is an object (see below).
 - `alert_thresholds` : an object with key/values pair, where the keys are integers and values are the number of missed blocks that defines the severity of the alert.
 - `emoji` : an object with key/values pair, where the keys are integers and values are emojis to be included in the Slack alert to reflect the severity of the alert.
 
-## How to run The  Ki Monitor
+The **block monitor** is configured from the `config-block.json` file. Following are the details of its parameters:
+- `api` : an object with key/values pairs with the names of the REST servers to watch and their URLs.
+- `hook` : the Slack Webhook to send Slack alerts.
+- `watcher`: the ping URL of a Cron Job Monitoring service (such as [healthchecks.io](https://healthchecks.io/)). To receive an alert if this script isn't running.
+- `emoji` : an object with key/values pairs, where the keys are integers and values are emojis to be included in the Slack alert to reflect the severity of the alert.
+
+
+## How to run The Ki Monitors
 To run the Ki monitor on your own server, follow these steps:
 
 Clone the repo:
@@ -35,9 +49,14 @@ Install the project
 ```
 cd ki-monitor & npm install
 ```
-Configure the monitor as explained in the previous section and run it as follows:
+Configure the validator monitor as explained in the previous section and run it as follows:
 ```
-node monitor.js
+node monitor.js config.js
+```
+
+Configure the block monitor as explained in the previous section and run it as follows:
+```
+node monitor_block.js config-block.js
 ```
 
 Indeed, this will launch a single monitoring cycle. To have a permanent monitoring schedule automatic periodic runs with any schedular such as `cron`.
