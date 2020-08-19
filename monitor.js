@@ -169,10 +169,10 @@ async function runMonitor(update_all) {
 
   for (val of vtw) {
     // check the number of missed block
-    // var temp_missed = data3[data2[data1[val].pubkey]]
+    var temp_missed = data3[data2[data1[val].pubkey]]
 
     // for testing
-    var temp_missed = Math.floor(Math.random() * 300)
+    // var temp_missed = Math.floor(Math.random() * 300)
 
     new_state[val] = temp_missed
     temp_old_state = (state[val] != undefined) ? state[val] : 0
