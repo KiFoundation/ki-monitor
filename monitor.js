@@ -1,9 +1,11 @@
 const https = require('https');
 const axios = require('axios');
-const config = require('./config.json');
+const state = require('./state.json');
+const config = require(process.argv[2]);
 const api = config.api;
 const hook = config.hook;
 const emoji = config.emoji;
+const watcher = config.watcher;
 const slack_users = config.slack_users;
 const validators_to_watch = config.validators
 const alert_thresholds = config.alert_thresholds;
@@ -131,11 +133,27 @@ function getSeverity(missed) {
   return sev
 }
 
+// ping the watcher to continuously ensure the script is up
+async function pingWatcher() {
+  https.get(watcher).on('error', (err) => {
+    console.log('Ping failed: ' + err)
+  });
+}
+
+// Save the last state of each validator
+function saveState(data) {
+  var fs = require('fs');
+  fs.writeFile('./state.json', JSON.stringify(data), 'utf8', function(err){
+    if(err) throw err;
+  });
+}
+
 // Run one cycle of monitoring
 async function runMonitor(update_all) {
   var validators_to_alert = []
   var temp_tag = ''
   var temp_mention = ''
+  var new_state = {}
 
   if (update_all) {
     var data1 = await getAllActiveValidators()
@@ -151,13 +169,16 @@ async function runMonitor(update_all) {
 
   for (val of vtw) {
     // check the number of missed block
-    var temp_missed = data3[data2[data1[val].pubkey]]
+    // var temp_missed = data3[data2[data1[val].pubkey]]
 
     // for testing
-    // var temp_missed = Math.floor(Math.random() * 100)
+    var temp_missed = Math.floor(Math.random() * 300)
+
+    new_state[val] = temp_missed
+    temp_old_state = (state[val] != undefined) ? state[val] : 0
 
     // if it is greater than the threashold send an alert on slack
-    if (temp_missed >= 10) {
+    if (temp_missed >= alert_thresholds['notice'] && temp_missed > temp_old_state) {
       // Tag if the user chose to recieve an alert for the current number of missed blocks
       if (Object.keys(slack_users).includes(val)) {
         temp_tag = (temp_missed >= alert_thresholds[slack_users[val].alert_threshold]);
@@ -171,7 +192,15 @@ async function runMonitor(update_all) {
     }
   }
 
+  // send the alerts
   const slackResponse = await sendAlerts(validators_to_alert)
+
+  // save the state
+  saveState(new_state)
+
+  // ping the watcher
+  await pingWatcher();
+
   return slackResponse;
 }
 

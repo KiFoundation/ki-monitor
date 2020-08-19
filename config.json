@@ -1,5 +1,6 @@
 {
   "api": "",
+  "watcher" : "",
   "validators": [],
   "hook": "",
   "slack_users": {
