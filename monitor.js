@@ -1,14 +1,21 @@
 const https = require('https');
 const axios = require('axios');
-const state = require('./state.json');
 const config = require(process.argv[2]);
 const api = config.api;
-const hook = config.hook;
 const emoji = config.emoji;
 const watcher = config.watcher;
+const tg_group = config.tg_group;
+const tg_bot_token = config.tg_bot_token;
+const slack_hook = config.slack_hook;
 const slack_users = config.slack_users;
 const validators_to_watch = config.validators
 const alert_thresholds = config.alert_thresholds;
+const update_all = true
+const test_interval_min = process.argv[4]
+
+var test_interval_block = test_interval_min * 60 / 5
+var state = require(process.argv[3]);
+
 
 // Get all active validators
 async function getAllActiveValidators() {
@@ -69,15 +76,14 @@ async function getSigningInfo() {
 }
 
 // Format the alert message and send it to slack
-function sendAlerts(data) {
+function sendAlertsSlack(data) {
   let messageBody = {
     "text": ""
   }
   for (line of data) {
     temp_tag = line[3] ? line[2] : ""
-    messageBody.text += emoji[line[4]] + " *" + line[0] + "* has missed the last " + line[1] + " blocks " + temp_tag + "\n"
+    messageBody.text += String.fromCodePoint(emoji[line[4]]) + " *" + line[0] + "* has missed " + line[1] + " blocks over the last 5000 blocks " + temp_tag + "\n"
   }
-
 
   try {
     messageBody = JSON.stringify(messageBody);
@@ -96,7 +102,7 @@ function sendAlerts(data) {
     };
 
     // actual request
-    const req = https.request(hook, requestOptions, (res) => {
+    const req = https.request(slack_hook, requestOptions, (res) => {
       let response = '';
 
 
@@ -121,6 +127,27 @@ function sendAlerts(data) {
   });
 }
 
+// Format the alert message and send it to Telegram
+function sendAlertsTelegram(data) {
+  let messageBody = {
+    "text": ""
+  }
+
+  for (line of data) {
+    temp_tag = line[3] ? line[2] : ""
+    // remove reserved char form moniker:
+    moniker = line[0].replace("_", "\_")
+                      .replace("-", "\-")
+                      .replace(".", "\.")
+                      .replace("*", "\*")
+                      .replace("[", "\[")
+                      .replace("`", "\`");
+    messageBody.text += String.fromCodePoint(emoji[line[4]]) + " <b>" + moniker + "</b> has missed " + line[1] + " blocks over the last 5000 blocks \n -------- \n "
+  }
+
+  telegram.sendMessage(tg_group, messageBody.text, {parse_mode:"HTML"})
+}
+
 // Get the level of severity of the downtime
 function getSeverity(missed) {
   var sev = 0;
@@ -143,65 +170,107 @@ async function pingWatcher() {
 // Save the last state of each validator
 function saveState(data) {
   var fs = require('fs');
-  fs.writeFile('./state.json', JSON.stringify(data), 'utf8', function(err){
+  fs.writeFile(process.argv[3], JSON.stringify(data), 'utf8', function(err){
     if(err) throw err;
   });
+
+  return data
 }
 
 // Run one cycle of monitoring
-async function runMonitor(update_all) {
+async function runMonitor() {
+  var now = new Date()
+  console.log("\n" + now.toISOString() + ": Satrting a monitoring cycle \n")
+
   var validators_to_alert = []
   var temp_tag = ''
   var temp_mention = ''
   var new_state = {}
 
   if (update_all) {
-    var data1 = await getAllActiveValidators()
-    var data2 = await getAllActiveValidatorConsAddress()
+    var active_validators = await getAllActiveValidators()
+    var active_validators_cons = await getAllActiveValidatorConsAddress()
   }
 
-  var data3 = await getSigningInfo()
+  var signing_info = await getSigningInfo()
   if (validators_to_watch.length != 0) {
     var vtw = validators_to_watch
   } else {
-    var vtw = Object.keys(data1)
+    var vtw = Object.keys(active_validators)
   }
 
   for (val of vtw) {
     // check the number of missed block
-    var temp_missed = data3[data2[data1[val].pubkey]]
+    var current_missed = {
+                      missed : signing_info[active_validators_cons[active_validators[val].pubkey]],
+                      alerts : 1
+                      }
 
     // for testing
-    // var temp_missed = Math.floor(Math.random() * 300)
+    // var current_missed = {missed : Math.floor(Math.random() * 600), alerts : 1 }
 
-    new_state[val] = temp_missed
-    temp_old_state = (state[val] != undefined) ? state[val] : 0
+    // prepare the new state
+    new_state[val] = current_missed
 
-    // if it is greater than the threashold send an alert on slack
-    if (temp_missed >= alert_thresholds['notice'] && temp_missed > temp_old_state) {
+    // get the old state
+    temp_old_state_missed = (state[val] != undefined) ? state[val].missed : 0 // if first run
+    temp_old_state_alerts = (state[val] != undefined) ? state[val].alerts : 1 // if first run
+
+    // if current missed is greater than the threshold adjusted with the alert offset send an alert on slack
+    if (current_missed.missed >= parseInt(temp_old_state_missed) + Math.min(alert_thresholds['notice'] * temp_old_state_alerts, test_interval_block) ) {
+      console.log( "Added validator to the alert list : " + active_validators[val].moniker)
+
+      // update the alert counter
+      new_state[val].alerts = temp_old_state_alerts + 1
+
       // Tag if the user chose to recieve an alert for the current number of missed blocks
       if (Object.keys(slack_users).includes(val)) {
-        temp_tag = (temp_missed >= alert_thresholds[slack_users[val].alert_threshold]);
+        temp_tag = (current_missed.missed >= alert_thresholds[slack_users[val].alert_threshold]);
         temp_mention = slack_users[val].slack_username;
       } else {
         temp_tag = false;
         temp_mention = 0;
       }
       // Prepare the message data for the slack alert function
-      validators_to_alert.push([data1[val].moniker, temp_missed, temp_mention, temp_tag, getSeverity(temp_missed)])
+      validators_to_alert.push([active_validators[val].moniker, current_missed.missed, temp_mention, temp_tag, getSeverity(current_missed.missed)])
+    }
+    else{
+      // if it is less than the old state reset the alert counter
+      if (current_missed.missed < temp_old_state_missed) {
+        new_state[val].alerts = 1
+      }
+      // if it is greater than the old state (unadjusted) maintain the old alert counter
+      else{
+        new_state[val].alerts = temp_old_state_alerts
+      }
     }
   }
 
-  // send the alerts
-  const slackResponse = await sendAlerts(validators_to_alert)
+  if (validators_to_alert.length == 0){
+    console.log( "No validator needs to be alerted")
+  }
+  else{
+    // send the alerts
+    await sendAlertsSlack(validators_to_alert)
+    await sendAlertsTelegram(validators_to_alert)
+  }
+
 
   // save the state
-  saveState(new_state)
+  state = saveState(new_state)
 
   // ping the watcher
   await pingWatcher();
 
-  return slackResponse;
+  now = new Date()
+  console.log("\n" + now.toISOString() + ": Monitoring cycle ended")
+  console.log("\nWaiting for the next cycle ...")
+
+  setTimeout(runMonitor, test_interval_min * 60 * 1000)
 }
 
-runMonitor(true)
+var TelegramBot = require("node-telegram-bot-api")
+telegram = new TelegramBot(tg_bot_token, {polling: true});
+
+runMonitor()
+
