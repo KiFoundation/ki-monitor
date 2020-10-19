@@ -10,9 +10,9 @@ This repository hosts `ki-monitor`, a simple script to monitor and alert the KiC
 
 The **validator monitor** allows to:
 
--   Track the number of missed block over set time windows.
--   Send slack messages to alert the operators.
--   Configure the level and thresholds of alerts.
+- Track the number of missed block over set time windows.
+- Send slack messages to alert the operators.
+- Configure the level and thresholds of alerts.
 
 The **block monitor** allows to:
 - Ensure that the node is always synched to the highest block number.
@@ -25,7 +25,9 @@ The **validator monitor** is configured from the `config.json` file. Following a
 
 - `api` : the URL of the REST server to query.
 - `validators` : an array with the operator addresses (`tkivaloper1...`) of the nodes to monitor. An empty array `[]` means that all the active validators are monitored.
-- `hook` : the Slack Webhook to send Slack alerts.
+- `tg_group`: the ID of the telegram group where the monitor will post alerts.
+- `tg_bot_token`: the Telegram bot token as generated through [BotFather](https://core.telegram.org/bots#6-botfather).
+- `slack_hook` : the Slack Webhook to send Slack alerts.
 - `watcher`: the ping URL of a Cron Job Monitoring service (such as [healthchecks.io](https://healthchecks.io/)). To receive an alert if this script isn't running.
 - `slack_users` : the slack users to notify with their personal configuration. This is an object (see below).
 - `alert_thresholds` : an object with key/values pair, where the keys are integers and values are the number of missed blocks that defines the severity of the alert.
@@ -51,15 +53,17 @@ cd ki-monitor & npm install
 ```
 Configure the validator monitor as explained in the previous section and run it as follows:
 ```
-node monitor.js config.js
+node monitor.js ./config.json ./state.json 10
 ```
+
+This will run the script in deamon mode where `./config.json` is the configuration file, `./state.json` is a file to store the current state and `10` is the (configurable) interval between the monitoring cycles.
 
 Configure the block monitor as explained in the previous section and run it as follows:
 ```
 node monitor_block.js config-block.js
 ```
 
-Indeed, this will launch a single monitoring cycle. To have a permanent monitoring schedule automatic periodic runs with any schedular such as `cron`.
+This will launch a single block monitoring cycle. To have a permanent monitoring, schedule periodic runs with any schedular such as `cron`.
 
 
 ## Subscribe to the KI ecosystem Slack alerts
