@@ -20,7 +20,7 @@ The **block monitor** allows to:
 - Monitor multiple APIs (nodes).
 
 ## Installing and Running the Ki Monitor
-You can install and run your own instance of the Ki Monitor. Check this post for a full tutorial on how to set up configure and run the Ki Monitor 
+You can install and run your own instance of the Ki Monitor. Check [this post](https://medium.com/ki-foundation/kichain-how-to-use-the-ki-monitor-bf05206657e) for a full tutorial on how to set up configure and run the Ki Monitor. 
 
 ## Subscribe to the KI ecosystem Slack alerts
 If you want to receive notifications about the activity of your validators through the Ki Ecosystem Slack, please:
