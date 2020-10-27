@@ -19,52 +19,8 @@ The **block monitor** allows to:
 - Send slack messages to alert the operators.
 - Monitor multiple APIs (nodes).
 
-
-## Configurations
-The **validator monitor** is configured from the `config.json` file. Following are the details of its parameters:
-
-- `api` : the URL of the REST server to query.
-- `validators` : an array with the operator addresses (`tkivaloper1...`) of the nodes to monitor. An empty array `[]` means that all the active validators are monitored.
-- `tg_group`: the ID of the telegram group where the monitor will post alerts.
-- `tg_bot_token`: the Telegram bot token as generated through [BotFather](https://core.telegram.org/bots#6-botfather).
-- `slack_hook` : the Slack Webhook to send Slack alerts.
-- `watcher`: the ping URL of a Cron Job Monitoring service (such as [healthchecks.io](https://healthchecks.io/)). To receive an alert if this script isn't running.
-- `slack_users` : the slack users to notify with their personal configuration. This is an object (see below).
-- `alert_thresholds` : an object with key/values pair, where the keys are integers and values are the number of missed blocks that defines the severity of the alert.
-- `emoji` : an object with key/values pair, where the keys are integers and values are emojis to be included in the Slack alert to reflect the severity of the alert.
-
-The **block monitor** is configured from the `config-block.json` file. Following are the details of its parameters:
-- `api` : an object with key/values pairs with the names of the REST servers to watch and their URLs.
-- `hook` : the Slack Webhook to send Slack alerts.
-- `watcher`: the ping URL of a Cron Job Monitoring service (such as [healthchecks.io](https://healthchecks.io/)). To receive an alert if this script isn't running.
-- `emoji` : an object with key/values pairs, where the keys are integers and values are emojis to be included in the Slack alert to reflect the severity of the alert.
-
-
-## How to run The Ki Monitors
-To run the Ki monitor on your own server, follow these steps:
-
-Clone the repo:
-```
-git clone https://github.com/KiFoundation/ki-monitor.git
-```
-Install the project
-```
-cd ki-monitor & npm install
-```
-Configure the validator monitor as explained in the previous section and run it as follows:
-```
-node monitor.js ./config.json ./state.json 10
-```
-
-This will run the script in deamon mode where `./config.json` is the configuration file, `./state.json` is a file to store the current state and `10` is the (configurable) interval between the monitoring cycles.
-
-Configure the block monitor as explained in the previous section and run it as follows:
-```
-node monitor_block.js config-block.js
-```
-
-This will launch a single block monitoring cycle. To have a permanent monitoring, schedule periodic runs with any schedular such as `cron`.
-
+## Installing and Running the Ki Monitor
+You can install and run your own instance of the Ki Monitor. Check this post for a full tutorial on how to set up configure and run the Ki Monitor 
 
 ## Subscribe to the KI ecosystem Slack alerts
 If you want to receive notifications about the activity of your validators through the Ki Ecosystem Slack, please:

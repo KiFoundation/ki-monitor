@@ -91,15 +91,13 @@ module.exports = {
   },
 
   // Run one cycle of monitoring
-  async runValidatorMonitor(config) {
-
+  async runValidatorMonitor(config, state) {
     const api = config.valmonitor.api;
     const watcher = config.valmonitor.watcher;
     const slack_users = config.valmonitor.slack_users;
     const validators_to_watch = config.valmonitor.validators
     const alert_thresholds = config.valmonitor.alert_thresholds;
     const test_interval_min = config.valmonitor.test_interval_min;
-    var state = require(config.valmonitor.state_file)
 
     var test_interval_block = test_interval_min * 60 / 5
 
@@ -140,8 +138,8 @@ module.exports = {
       new_state[val] = current_missed
 
       // get the old state
-      temp_old_state_missed = (state[val] != undefined) ? state[val].missed : 0 // if first run
-      temp_old_state_alerts = (state[val] != undefined) ? state[val].alerts : 1 // if first run
+      var temp_old_state_missed = (state[val] != undefined) ? state[val].missed : 0 // if first run
+      var temp_old_state_alerts = (state[val] != undefined) ? state[val].alerts : 1 // if first run
 
       // if current missed is greater than the threshold adjusted with the alert offset send an alert on slack
       if (current_missed.missed >= parseInt(temp_old_state_missed) + Math.min(alert_thresholds['notice'] * temp_old_state_alerts, test_interval_block)) {
@@ -185,14 +183,16 @@ module.exports = {
     state = module.exports.saveState(new_state, config.valmonitor.state_file)
 
     // ping the watcher
-    // await pingWatcher(watcher);
+    if (watcher != ""){
+      await pingWatcher(watcher);
+    }
 
     now = new Date()
     console.log("\n" + now.toISOString() + ": Monitoring cycle ended")
     console.log("\nWaiting for the next cycle ...")
 
     setTimeout(function() {
-      module.exports.runValidatorMonitor(config);
+      module.exports.runValidatorMonitor(config, state);
     }, test_interval_min * 60 * 1000)
   }
 }

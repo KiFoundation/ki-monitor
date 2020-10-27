@@ -55,7 +55,9 @@ module.exports = {
       await sendAlertsTelegram(data, "blc")
     }
     // ping the watcher
-    // await pingWatcher(watcher);
+    if (watcher != ""){
+      await pingWatcher(watcher);
+    }
 
     setTimeout(function() {
       module.exports.runBlockMonitor(config);
