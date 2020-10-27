@@ -1,24 +1,32 @@
 {
-  "api": "",
-  "watcher" : "",
-  "validators": [],
-  "hook": "",
-  "slack_users": {
-    "tkivaloper10a4ucqj8hfq0teyp8hzn6emu8jl6eelt5cl4ln": {
-      "slack_username": "<@U010A5BLLCF>",
-      "alert_threshold": "warning"
+  "valmonitor": {
+    "api": "",
+    "watcher": "",
+    "test_interval_min": 10,
+    "state_file": "./state.json",
+    "validators": [],
+    "slack_users": {},
+    "alert_thresholds": {
+      "notice": 20,
+      "warning": 200,
+      "error": 300,
+      "critical": 400
     }
   },
-  "alert_thresholds": {
-    "notice": 10,
-    "warning": 20,
-    "error": 30,
-    "critical": 40
+  "blcmonitor": {
+    "apis": {},
+    "watcher": "",
+    "test_interval_min": 5
   },
+
+  "tg_group": ,
+  "tg_bot_token": "",
+  "slack_hook": "",
+
   "emoji": {
-    "notice": ":information_source:",
-    "warning": ":warning:",
-    "error": ":scream:",
-    "critical": ":red_circle:"
+    "notice": "0x2139",
+    "warning": "0x26A0",
+    "error": "0x1F631",
+    "critical": "0x1F534"
   }
 }
