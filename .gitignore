@@ -7,3 +7,4 @@ config-priv-block.json
 local_height.sh
 test.js
 package-lock.json
+.config
