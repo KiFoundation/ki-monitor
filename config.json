@@ -14,12 +14,12 @@
     }
   },
   "blcmonitor": {
-    "apis": {},
+    "apis": [],
     "watcher": "",
     "test_interval_min": 5
   },
 
-  "tg_group": ,
+  "tg_group": "",
   "tg_bot_token": "",
   "slack_hook": "",
 

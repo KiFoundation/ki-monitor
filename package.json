@@ -7,9 +7,15 @@
   "repository": "https://github.com/KiFoundation/ki-monitor",
   "author": "KiFoundation",
   "license": "CC0-1.0",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
   "dependencies": {
     "axios": "^0.19.2",
     "node-telegram-bot-api": "^0.50.0",
     "telegraf": "^3.38.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.2"
   }
 }

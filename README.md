@@ -15,15 +15,19 @@ The **validator monitor** allows to:
 - Configure the level and thresholds of alerts.
 
 The **block monitor** allows to:
+
 - Ensure that the node is always synched to the highest block number.
 - Send slack messages to alert the operators.
 - Monitor multiple APIs (nodes).
 
 ## Installing and Running the Ki Monitor
-You can install and run your own instance of the Ki Monitor. Check [this post](https://medium.com/ki-foundation/kichain-how-to-use-the-ki-monitor-bf05206657e) for a full tutorial on how to set up configure and run the Ki Monitor. 
+
+You can install and run your own instance of the Ki Monitor. Check [this post](https://medium.com/ki-foundation/kichain-how-to-use-the-ki-monitor-bf05206657e) for a full tutorial on how to set up configure and run the Ki Monitor.
 
 ## Subscribe to the KI ecosystem Slack alerts
+
 If you want to receive notifications about the activity of your validators through the Ki Ecosystem Slack, please:
+
 - Create a PR to this repository that adds your operator address, slack user ID and your chosen alert threshold to the config file. E.g.,
   ```
   "slack_users" : {
@@ -44,5 +48,14 @@ If you want to receive notifications about the activity of your validators throu
    }
   ```
 
+## Code Style
+
+Format using:
+
+```console
+npm run format
+```
+
 ## Security
+
 If you discover a security vulnerability in this project, please report it to security@foundation.ki. We will promptly address all security vulnerabilities.
