@@ -1,4 +1,4 @@
-
+.idea
 config-priv.json
 node_modules/*
 config-dev.json
@@ -6,3 +6,4 @@ backup.sh
 config-priv-block.json
 local_height.sh
 test.js
+package-lock.json
