@@ -17,7 +17,12 @@ module.exports = {
     await axios
       .get(api + "/staking/validators")
       .then(function (response) {
-        console.log(response.data);
+        console.log("Height: ", response.data.height);
+        console.log("validators: ");
+
+        for (val of response.data.result){
+          console.log("\t", val.operator_address);
+        }
         validators = response.data.result;
       })
       .catch(function (error) {

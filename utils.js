@@ -4,10 +4,21 @@ const emoji = config.emoji;
 const tg_group = config.tg_group;
 
 const slack_hook = config.slack_hook;
+const grace_period = config.grace_period;
+
+const isGracePeriod = () => {
+  let now = new Date();
+  let today = new Date().toDateString();
+  let start = new Date(today + " " + grace_period.start)
+  let end = new Date(today + " " + grace_period.end)
+
+  return ( (start < now ) && (now < end) )
+};
 
 module.exports = {
   // Format the alert message and send it to slack
   sendAlertsSlack(data, id) {
+
     let messageBody = {
       text: "",
     };
@@ -24,6 +35,13 @@ module.exports = {
           " blocks over the last 5000 blocks " +
           temp_tag +
           "\n";
+      }
+
+      if (isGracePeriod()){
+        messageBody.text += "[Context = 'Osmosis_Tolerate']"
+      }
+      else{
+        messageBody.text += "[Context = 'Normal']"
       }
     }
 
@@ -105,6 +123,13 @@ module.exports = {
           "</b> has missed " +
           line[1] +
           " blocks over the last 5000 blocks \n -------- \n ";
+
+      }
+      if (isGracePeriod()){
+        messageBody.text += "[Context = 'Osmosis_Tolerate']"
+      }
+      else{
+        messageBody.text += "[Context = 'Normal']"
       }
     }
 
