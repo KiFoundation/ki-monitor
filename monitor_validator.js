@@ -17,7 +17,6 @@ module.exports = {
     await axios
       .get(api + "/staking/validators")
       .then(function (response) {
-        console.log(response.data);
         validators = response.data.result;
       })
       .catch(function (error) {
@@ -28,6 +27,7 @@ module.exports = {
     for (const validator of validators) {
       validator_data[validator.operator_address] = {
         moniker: validator.description.moniker,
+        operatorAddress: validator.operator_address,
         pubkey: validator.consensus_pubkey,
       };
     }
@@ -186,6 +186,7 @@ module.exports = {
           temp_mention,
           temp_tag,
           module.exports.getSeverity(current_missed.missed, alert_thresholds),
+          active_validators[val].operatorAddress
         ]);
       } else {
         // if it is less than the old state reset the alert counter
