@@ -33,7 +33,7 @@ module.exports = {
     for (const validator of validators) {
       validator_data[validator.operator_address] = {
         moniker: validator.description.moniker,
-        pubkey: validator.consensus_pubkey,
+        pubkey: validator.consensus_pubkey.value,
       };
     }
     return validator_data;
@@ -54,7 +54,7 @@ module.exports = {
       });
 
     for (const validator of validators.validators) {
-      addresses[validator.pub_key] = validator.address;
+      addresses[validator.pub_key.value] = validator.address;
     }
 
     return addresses;
@@ -74,7 +74,7 @@ module.exports = {
       });
 
     for (validator of signing_info) {
-      missed_blocks[validator.address] = validator.missed_blocks_counter;
+      missed_blocks[validator.address] = validator.missed_blocks_counter || '0' ;
     }
     return missed_blocks;
   },
@@ -102,7 +102,9 @@ module.exports = {
   // Run one cycle of monitoring
   async runValidatorMonitor(config, state) {
     const api = config.valmonitor.api;
+    const tg_alerting = config.tg_alerting;
     const watcher = config.valmonitor.watcher;
+    const slack_alerting = config.slack_alerting;
     const slack_users = config.valmonitor.slack_users;
     const validators_to_watch = config.valmonitor.validators;
     const alert_thresholds = config.valmonitor.alert_thresholds;
@@ -127,6 +129,7 @@ module.exports = {
     }
 
     const signing_info = await module.exports.getSigningInfo(api);
+
     let vtw;
     if (validators_to_watch.length !== 0) {
       vtw = validators_to_watch;
@@ -144,7 +147,7 @@ module.exports = {
 
       // for testing
       // var current_missed = {
-      //   missed: Math.floor(Math.random() * 100),
+      //   missed: Math.floor(Math.random() * 1000),
       //   alerts: 1
       // }
 
@@ -208,8 +211,8 @@ module.exports = {
       console.log("No validator needs to be alerted");
     } else {
       // send the alerts
-      await sendAlertsSlack(validators_to_alert, "val");
-      await sendAlertsTelegram(validators_to_alert, "val");
+      if (slack_alerting == 1) await sendAlertsSlack(validators_to_alert, "val");
+      if (tg_alerting == 1) await sendAlertsTelegram(validators_to_alert, "val");
     }
 
     // save the state

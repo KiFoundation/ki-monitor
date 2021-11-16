@@ -19,9 +19,14 @@
     "test_interval_min": 5
   },
 
+  "tg_alerting": 1,
   "tg_group": "",
   "tg_bot_token": "",
+
+  "slack_alerting": 1,
   "slack_hook": "",
+
+  "grace_period_alerting": 0,
   "grace_period" : {
     "start": "00:00:00 GMT",
     "end": "00:00:00 GMT"

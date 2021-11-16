@@ -5,14 +5,20 @@ const tg_group = config.tg_group;
 
 const slack_hook = config.slack_hook;
 const grace_period = config.grace_period;
+const grace_period_alerting = config.grace_period_alerting;
+
 
 const isGracePeriod = () => {
-  let now = new Date();
-  let today = new Date().toDateString();
-  let start = new Date(today + " " + grace_period.start)
-  let end = new Date(today + " " + grace_period.end)
+  if (grace_period_alerting == 1){
+    let now = new Date();
+    let today = new Date().toDateString();
+    let start = new Date(today + " " + grace_period.start)
+    let end = new Date(today + " " + grace_period.end)
 
-  return ( (start < now ) && (now < end) )
+    return ( (start < now ) && (now < end) )
+  }else {
+    return false
+  }
 };
 
 module.exports = {
