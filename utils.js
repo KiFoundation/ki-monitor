@@ -35,10 +35,11 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji[line[4]]) +
           " *" +
-          line[0] +
+          line[0] + " " + config.metadata.chain +
           "* has missed " +
           line[1] +
           " blocks over the last 5000 blocks " +
+          " " + config.metadata.explorer + line[5] + " " +
           temp_tag +
           "\n";
       }
@@ -55,7 +56,7 @@ module.exports = {
       for (const line of data) {
         messageBody.text +=
           String.fromCodePoint(emoji["critical"]) +
-          " " +
+          " "  + " " + config.metadata.chain +
           line[0] +
           " is delayed by " +
           line[1] +
@@ -125,7 +126,7 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji[line[4]]) +
           " <b>" +
-          moniker +
+          moniker + " " + config.metadata.chain +
           "</b> has missed " +
           line[1] +
           " blocks over the last 5000 blocks \n -------- \n ";
@@ -144,7 +145,7 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji["critical"]) +
           " <b>" +
-          line[0] +
+          line[0] + " " + config.metadata.chain +
           "</b> is delayed by " +
           line[1] +
           " seconds | local height : " +

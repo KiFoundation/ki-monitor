@@ -1,4 +1,8 @@
 {
+  "metadata" : {
+    "explorer": ""
+    "chain": ""
+  },
   "valmonitor": {
     "api": "",
     "watcher": "",
