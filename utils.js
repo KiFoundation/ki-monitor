@@ -9,7 +9,7 @@ const grace_period_alerting = config.grace_period_alerting;
 
 
 const isGracePeriod = () => {
-  if (grace_period_alerting == 1){
+  if (grace_period_alerting === 1){
     let now = new Date();
     let today = new Date().toDateString();
     let start = new Date(today + " " + grace_period.start)
@@ -44,11 +44,13 @@ module.exports = {
           "\n";
       }
 
-      if (isGracePeriod()){
-        messageBody.text += "[Context = 'Osmosis_Tolerate']"
-      }
-      else{
-        messageBody.text += "[Context = 'Normal']"
+      if ( grace_period_alerting ){
+        if (isGracePeriod() ){
+          messageBody.text += "[Context = 'Osmosis_Tolerate']"
+        }
+        else{
+          messageBody.text += "[Context = 'Normal']"
+        }
       }
     }
 

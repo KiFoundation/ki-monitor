@@ -213,8 +213,8 @@ module.exports = {
       console.log("No validator needs to be alerted");
     } else {
       // send the alerts
-      if (slack_alerting == 1) await sendAlertsSlack(validators_to_alert, "val");
-      if (tg_alerting == 1) await sendAlertsTelegram(validators_to_alert, "val");
+      if (slack_alerting === 1) await sendAlertsSlack(validators_to_alert, "val");
+      if (tg_alerting === 1) await sendAlertsTelegram(validators_to_alert, "val");
     }
 
     // save the state
