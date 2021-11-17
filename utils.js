@@ -129,7 +129,7 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji[line[4]]) +
           " <b>" +
-          moniker + " " + config.metadata.chain +
+          moniker + 
           "</b> has missed " +
           line[1] +
           " blocks over the last 5000 blocks" +
@@ -150,7 +150,7 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji["critical"]) +
           " <b>" +
-          line[0] + " " + config.metadata.chain +
+          line[0] +
           "</b> is delayed by " +
           line[1] +
           " seconds | local height : " +
