@@ -4,10 +4,27 @@ const emoji = config.emoji;
 const tg_group = config.tg_group;
 
 const slack_hook = config.slack_hook;
+const grace_period = config.grace_period;
+const grace_period_alerting = config.grace_period_alerting;
+
+
+const isGracePeriod = () => {
+  if (grace_period_alerting === 1){
+    let now = new Date();
+    let today = new Date().toDateString();
+    let start = new Date(today + " " + grace_period.start)
+    let end = new Date(today + " " + grace_period.end)
+
+    return ( (start < now ) && (now < end) )
+  }else {
+    return false
+  }
+};
 
 module.exports = {
   // Format the alert message and send it to slack
   sendAlertsSlack(data, id) {
+
     let messageBody = {
       text: "",
     };
@@ -17,14 +34,23 @@ module.exports = {
         temp_tag = line[3] ? line[2] : "";
         messageBody.text +=
           String.fromCodePoint(emoji[line[4]]) +
-          " *" +
-          line[0] + " " + config.metadata.chain +
-          "* has missed " +
+          " *<"+ config.metadata.explorer + line[5] + "|"  +
+          line[0] + ">* " +
+          " has missed " +
           line[1] +
           " blocks over the last 5000 blocks " +
-          " " + config.metadata.explorer + line[5] + " " +
+          " [" + config.metadata.chain + "]" +
           temp_tag +
           "\n";
+      }
+
+      if ( grace_period_alerting ){
+        if (isGracePeriod() ){
+          messageBody.text += "[Context = 'Osmosis_Tolerate']"
+        }
+        else{
+          messageBody.text += "[Context = 'Normal']"
+        }
       }
     }
 
@@ -32,12 +58,13 @@ module.exports = {
       for (const line of data) {
         messageBody.text +=
           String.fromCodePoint(emoji["critical"]) +
-          " " +
-          line[0] + " " + config.metadata.chain +
+          " "  +
+          line[0] +
           " is delayed by " +
           line[1] +
           " seconds | local height : " +
           line[2] +
+          " [" + config.metadata.chain + "]" +
           "\n";
       }
     }
@@ -102,10 +129,19 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji[line[4]]) +
           " <b>" +
-          moniker + " " + config.metadata.chain +
+          moniker + 
           "</b> has missed " +
           line[1] +
-          " blocks over the last 5000 blocks \n -------- \n ";
+          " blocks over the last 5000 blocks" +
+          " [" + config.metadata.chain + "]" +
+          "\n -------- \n ";
+
+      }
+      if (isGracePeriod()){
+        messageBody.text += "[Context = 'Osmosis_Tolerate']"
+      }
+      else{
+        messageBody.text += "[Context = 'Normal']"
       }
     }
 
@@ -114,11 +150,12 @@ module.exports = {
         messageBody.text +=
           String.fromCodePoint(emoji["critical"]) +
           " <b>" +
-          line[0] + " " + config.metadata.chain +
+          line[0] +
           "</b> is delayed by " +
           line[1] +
           " seconds | local height : " +
           line[2] +
+          " [" + config.metadata.chain + "]" +
           "\n -------- \n";
       }
     }
